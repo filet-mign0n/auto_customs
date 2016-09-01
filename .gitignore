@@ -1,0 +1,16 @@
+*~
+*.swp
+*.swo
+*.pyc
+.npm
+/pid/*
+/log/*
+sample_list.txt
+node_modules
+npm-debug.log*
+promise_test.js
+.DS_Store 
+t.py
+tyse.csv
+selenium-server-standalone-3.0.0-beta2.jar
+chromedriver
