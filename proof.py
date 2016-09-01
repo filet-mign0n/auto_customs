@@ -188,13 +188,6 @@ def clear_and_fill_input(inpt, value):
 	except Exception as e:
 		print 'error inputing', value, e
 
-# Click ADD once to be on last line
-try:
-	_Add.click()
-except Exception as e:
-	print 'error trying to click Add:', e
-
-
 # Loop through CSV
 for i in range(5):
 
@@ -217,6 +210,8 @@ for i in range(5):
 	clear_and_fill_input(_SupplierNo, supplier_num)
 	clear_and_fill_input(_DutiableItemCostEfp, price)
 	# select currency
+	print 'selecting currency'
+	_DutiableItemCostCurrencySel.deselect_all()
 	try:
 		_DutiableItemCostCurrencySel.select_by_value('SGD')
 	except Exception as e:
@@ -225,7 +220,7 @@ for i in range(5):
 	
 
 
-	print 'about to click ADD with cc: %s, qty: %s, cases: %s, price: %s, invoice: %s, currency: SGD, supplier_num: %s' % (cc, qty, cases, price, inv, supplier_num)
+	print 'about to click ADD with cc: %s, qty: %s, supplier_num: %s' % (cc, qty, supplier_num)
 	try:
 		_Add.click()
 	except Exception as e:
