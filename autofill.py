@@ -8,12 +8,9 @@ unzip chromedriver_linux32_x.x.x.x.zip
 
 check this npm later https://github.com/vvo/selenium-standalone
 
-make sure u got JAVA JRE 8
-
-Run 
-`java -jar selenium-server-stand*jar -port 1029`
-before launching
-
+for Remote Server:
+make sure u got JAVA JRE 8 
+Run `java -jar selenium-server-stand*jar -port 1029`
 '''
 
 from selenium import webdriver
@@ -23,19 +20,36 @@ from selenium.webdriver.support.ui import WebDriverWait, Select
 from selenium.webdriver.support import expected_conditions as EC
 import pandas as pd
 import time
+import json
 import sys
 
 import random
 
-supplier_num = 28608
+with open('config.json') as config:
+	config = json.load(config)
+
+supplier_num = config['supplier_num']
+username = config['username']
+password = config['password']
+
 csvfile = 'tyse.csv'
+
+def closewindows(driver, keep=None):
+	if keep: # keep only window of interest open
+		for window in driver.window_handles:
+			if window != keep:
+				driver.switch_to_window(window)
+				driver.close()
+		driver.switch_to_window(keep)
+	else: # close all windows
+		driver.quit()
 
 # First check and load csv
 try:
 	tyse = pd.read_csv(csvfile)
 except Exception as e:
 	print e
-	closewindows(driver, driver.window_handles)
+	closewindows(driver)
 	sys.exit(1)
 
 tyse = tyse.iterrows() 
@@ -48,10 +62,6 @@ driver.get("http://www.tradelink-ebiz.com/eng/index.html")
 assert "Tradelink-eBiz.com" in driver.title
 print 'accessed webpage:', driver.title
 
-def closewindows(driver, windows):
-	for window in windows:
-		driver.switch_to_window(window)
-		driver.close()
 
 for handle in driver.window_handles:
 	homepage = handle
@@ -66,12 +76,14 @@ while True:
 		break
 	if time.time() > timeout:
 		print 'timeout or error loading popup page'
-		closewindows(driver, driver.window_handles)
+		closewindows(driver)
 		sys.exit(1)
 
 
 for handle in driver.window_handles:
 	if handle != homepage:
+		print 'switching to login window'
+		main_window = handle
 		driver.switch_to_window(handle)
 
 # Wait at least until the username field loads up
@@ -80,15 +92,15 @@ try:
         EC.presence_of_element_located((By.ID, "username")))
 except Exception as e:
     print "timeout or error loading popup page:", e
-    closewindows(driver, driver.window_handles)
+    closewindows(driver)
     sys.exit(1)
 
 print "inserting username"
-elem.send_keys("mjp98280")
+elem.send_keys(username)
 
 elem = driver.find_element_by_id("password")
 print "inserting password"
-elem.send_keys("France1980")
+elem.send_keys(password)
 
 print "clicking on \"Login\""
 elem = driver.find_element_by_id("login").click()
@@ -100,7 +112,7 @@ try:
 except Exception as e:
 	# selenium.common.exceptions.TimeoutException
     print 'timeout or error loading skip page:', e
-    closewindows(driver, driver.window_handles)
+    closewindows(driver)
     sys.exit(1)
 
 print "clicking on \"Skip\""
@@ -112,8 +124,11 @@ try:
         EC.presence_of_element_located((By.CSS_SELECTOR, draft)))
 except Exception as e:
     print 'timeout or error loading Gateway page:', e
-    closewindows(driver, driver.window_handles)
+    closewindows(driver)
     sys.exit(1)
+
+# close surrounding windows to focus on main
+closewindows(driver, main_window)
 
 print "clicking on \"Draft\" tab"
 elem.click()
@@ -125,7 +140,7 @@ try:
         EC.presence_of_element_located((By.CSS_SELECTOR, message_id)))
 except Exception as e:
     print 'timeout or error loading Gateway page:', e
-    closewindows(driver, driver.window_handles)
+    closewindows(driver)
     sys.exit(1)
 
 print "clicking on first row of \"Drafts\" table"
@@ -140,15 +155,8 @@ try:
         EC.presence_of_element_located((By.NAME, "_CommodityCode")))
 except Exception as e:
     print 'timeout or error loading Draft page:', e
-    closewindows(driver, driver.window_handles)
+    closewindows(driver)
     sys.exit(1)
-
-def fecth_input_elem(name):
-	try:
-		_Add = driver.find_element_by_name(name)
-	except Exception as e:
-	    print 'error fetching elem:', name, e
-
 
 # Fetch all input elems
 try:
@@ -162,7 +170,7 @@ except Exception as e:
 try:
 	_NoOfCase = driver.find_element_by_name('_NoOfCase')
 except Exception as e:
-    print 'timeout or error lfetching _NoOfCase:', e
+    print 'timeout or error fetching _NoOfCase:', e
 try:
 	_SupplierNo = driver.find_element_by_name('_SupplierNo')
 except Exception as e:
@@ -199,6 +207,7 @@ except Exception as e:
 for i in range(5):
 
 	# Get values
+	# TODO: add more testing for corrupt or missing cells
 	row = next(tyse)[1]
 	cc = row['Comm. Code']
 	qty = row['Packing']
@@ -232,31 +241,18 @@ for i in range(5):
 		print 'error trying to click Add:', e
 
 
-
-
-js_script = '''
-var A = _PermitApplication_DutiableCommodityInfo__PermitApplication_DutiableCommodityInfo_var;
-var CCs = []
-A.forEach(function(a) { 
-	CCs.push(a[1]);
-  }); //logs all Commodity Codes
-return CCs;
-'''
-try:
-	A = driver.execute_script(js_script)
-except Exception as e:
-	print 'error executing js script:', e
-
-print '\n all Commodity Codes found in online table:'
-print A
-
-
-'''
-select = Select(driver.find_element_by_name('name'))
-select.select_by_index(index)
-select.select_by_visible_text("text")
-select.select_by_value(value)
-
-driver.execute_script('alert("payday");') !!!!
-driver.save_screenshot('screenshot.png') !!!!
-'''
+# js_script = '''
+# var A = _PermitApplication_DutiableCommodityInfo__PermitApplication_DutiableCommodityInfo_var;
+# var CCs = [];
+# A.forEach(function(a) { CCs.push(a[1]); });
+# return CCs;
+# '''
+# try:
+# 	A = driver.execute_script(js_script)
+# except Exception as e:
+# 	print 'error executing js script:', e
+# 
+# print '\n all Commodity Codes found in online table:'
+# print A
+# 
+# driver.save_screenshot('screenshot.png')

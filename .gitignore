@@ -5,6 +5,7 @@
 .npm
 /pid/*
 /log/*
+config.json
 sample_list.txt
 node_modules
 npm-debug.log*
