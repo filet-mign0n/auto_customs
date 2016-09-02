@@ -31,7 +31,7 @@ parser.add_option("-c", "--config", dest="config", default='config.json',
 					help="path to Config File")
 (options, args) = parser.parse_args()
 
-print '\n✈ 🚢  🚚  👮  Auto-Dutiable™ session started 👮  🚚  🚢  ✈\n' 
+print '\n✈ 🚢  🚚  👮  Auto-Customs session started 👮  🚚  🚢  ✈\n' 
 
 try:
 	driver = webdriver.Chrome()
