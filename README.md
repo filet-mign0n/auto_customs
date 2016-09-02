@@ -12,7 +12,7 @@ The Python app will take a csv file as input, map the column names to form input
 ###Install
 
 ```sh
-$ git clone https://github.com/filet-mign0n/autofill_customs && cd autofill_customs && sudo pip install requirements.txt
+$ git clone https://github.com/filet-mign0n/auto_customs && cd auto_customs && sudo pip install requirements.txt
 ```
 ###Configure
 
