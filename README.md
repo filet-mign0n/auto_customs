@@ -1,4 +1,4 @@
-Autofill Customs
+Auto-Customs
 ========
 
 Hong Kong's customs decleration website does not allow bulk upload of list of items to declare. The process in which to declare them one by one is painfully manual. This app automates it.
