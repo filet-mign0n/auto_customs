@@ -18,12 +18,18 @@ from selenium.webdriver.common.keys import Keys
 from selenium.webdriver.common.by import By
 from selenium.webdriver.support.ui import WebDriverWait, Select
 from selenium.webdriver.support import expected_conditions as EC
+from optparse import OptionParser
 import pandas as pd
+import random
 import time
 import json
 import sys
 
-import random
+parser = OptionParser()
+parser.add_option("-i", "--csv", dest="csv", help="path to CSV")
+parser.add_option("-c", "--config", dest="config", default='config.json', 
+					help="path to Config File")
+(options, args) = parser.parse_args()
 
 print '\n✈ 🚢  🚚  👮  Auto-Dutiable™ session started 👮  🚚  🚢  ✈\n' 
 
@@ -33,14 +39,15 @@ except Exception as e:
 	print '⚠️  error loading Google Chrome driver', e
 print '✅  successfully loaded Google Chrome Driver'
 
-with open('config.json') as config:
-	config = json.load(config)
+try:
+	config = open(options.config)
+except Exception as e:
+	print '⚠️  error loading Config File', e
 
+config = json.load(config)
 supplier_num = config['supplier_num']
 username = config['username']
 password = config['password']
-
-csvfile = 'tyse.csv'
 
 def closewindows(driver, keep=None):
 	if keep: # keep only window of interest open
@@ -54,7 +61,7 @@ def closewindows(driver, keep=None):
 
 # First check and load csv
 try:
-	tyse = pd.read_csv(csvfile)
+	tyse = pd.read_csv(options.csv)
 except Exception as e:
 	print '⚠️  error loading CSV:', e
 	closewindows(driver)
@@ -133,7 +140,7 @@ except Exception as e:
     closewindows(driver)
     sys.exit(1)
 
-print '✖  closing surrounding windows"
+print '✖  closing surrounding windows'
 closewindows(driver, main_window)
 
 print "👉  clicking on \"Draft\" tab"
