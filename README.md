@@ -23,7 +23,6 @@ Username, password, etc. should be documented in config.json before launching ap
 ```sh
 $ python autofill.py --csv /path/to/csv --config /path/to/config #optional
 ```
-
 ###Requirements
 
 * Python 2.7
