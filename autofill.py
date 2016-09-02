@@ -212,7 +212,7 @@ try:
 except Exception as e:
 	print '⚠️  error trying to click Add:', e
 
-print '\n✨✨✨ Time to automagically fill out the form ✨✨✨'
+print '\n✨✨✨ Time to automagically fill out the form✨✨✨\n'
 # Loop through CSV
 for i in range(5): #range(row_len): 
 
@@ -244,7 +244,7 @@ for i in range(5): #range(row_len):
 	
 
 
-	print '👉  clicking "ADD with the following filled in form:'
+	print '👉  clicking "ADD" with form filled as follows:'
 	print '📌  [cc: %s, qty: %s, cases: %s, price: %s, invoice: %s, currency: SGD]' % (cc, qty, cases, price, inv)
 
 	try:
