@@ -1,16 +1,16 @@
-'''
-get selenim server from:
-http://selenium-release.storage.googleapis.com/3.0-beta2/selenium-server -standalone-3.0.0-beta2.jar
+#!/usr/bin/env python
+# -*- coding: utf-8 -*-
 
-get chromedriver from:
+'''
+Get chromedriver here:
 http://chromedriver.storage.googleapis.com/2.23/chromedriver_mac64.zip
 unzip chromedriver_linux32_x.x.x.x.zip
 
-check this npm later https://github.com/vvo/selenium-standalone
-
-for Remote Server:
+For Remote Server:
+http://selenium-release.storage.googleapis.com/3.0-beta2/selenium-server
+or check this node module: https://github.com/vvo/selenium-standalone
 make sure u got JAVA JRE 8 
-Run `java -jar selenium-server-stand*jar -port 1029`
+Run `java -jar selenium-server-stand*jar`
 '''
 
 from selenium import webdriver
@@ -24,6 +24,14 @@ import json
 import sys
 
 import random
+
+print '\n✈ 🚢  🚚  👮  Auto-Dutiable™ session started 👮  🚚  🚢  ✈\n' 
+
+try:
+	driver = webdriver.Chrome()
+except Exception as e:
+	print '⚠️  error loading Google Chrome driver', e
+print '✅  successfully loaded Google Chrome Driver'
 
 with open('config.json') as config:
 	config = json.load(config)
@@ -48,26 +56,24 @@ def closewindows(driver, keep=None):
 try:
 	tyse = pd.read_csv(csvfile)
 except Exception as e:
-	print e
+	print '⚠️  error loading CSV:', e
 	closewindows(driver)
 	sys.exit(1)
 
+row_len = len(tyse)-1
 tyse = tyse.iterrows() 
-
-driver = webdriver.Chrome()
-
-print '############## AutoDutiableAdd session started ##############' 
+print '✅  successfully loaded CSV'
 
 driver.get("http://www.tradelink-ebiz.com/eng/index.html")
 assert "Tradelink-eBiz.com" in driver.title
-print 'accessed webpage:', driver.title
+print '✅  successfully accessed "Hong Kong Import and Export Trade and Business" webpage'
 
 
 for handle in driver.window_handles:
 	homepage = handle
 
 elem = driver.find_element_by_css_selector(".t3.t3-e")
-print 'clicking on Dutiable Commodities Permits tab'
+print '👉  clicking on "Dutiable Commodities Permits" tab'
 elem.click()
 
 timeout = time.time() + 30 
@@ -75,14 +81,14 @@ while True:
 	if len(driver.window_handles) > 1:
 		break
 	if time.time() > timeout:
-		print 'timeout or error loading popup page'
+		print '⚠️  timeout or error loading popup page'
 		closewindows(driver)
 		sys.exit(1)
 
 
 for handle in driver.window_handles:
 	if handle != homepage:
-		print 'switching to login window'
+		print '🔁  switching to login window'
 		main_window = handle
 		driver.switch_to_window(handle)
 
@@ -91,18 +97,18 @@ try:
     elem = WebDriverWait(driver, 30).until(
         EC.presence_of_element_located((By.ID, "username")))
 except Exception as e:
-    print "timeout or error loading popup page:", e
+    print "⚠️  timeout or error loading popup page:", e
     closewindows(driver)
     sys.exit(1)
 
-print "inserting username"
+print "🔐  inserting username"
 elem.send_keys(username)
 
 elem = driver.find_element_by_id("password")
-print "inserting password"
+print "🔐  inserting password"
 elem.send_keys(password)
 
-print "clicking on \"Login\""
+print "👉  clicking on \"Login\""
 elem = driver.find_element_by_id("login").click()
 
 skip = "body > table > tbody > tr:nth-child(2) > td > table > tbody > tr:nth-child(2) > td > table > tbody > tr:nth-child(2) > td > p:nth-child(3) > a:nth-child(4)"
@@ -111,11 +117,11 @@ try:
         EC.presence_of_element_located((By.CSS_SELECTOR, skip)))
 except Exception as e:
 	# selenium.common.exceptions.TimeoutException
-    print 'timeout or error loading skip page:', e
+    print '⚠️  timeout or error loading skip page:', e
     closewindows(driver)
     sys.exit(1)
-
-print "clicking on \"Skip\""
+print "🔓  successfully logged in"
+print "👉  clicking on \"Skip\""
 elem.click()
 
 draft = "body > div:nth-child(3) > div > table > tbody > tr:nth-child(1) > td > span > form > table > tbody > tr:nth-child(1) > td > table > tbody > tr > td:nth-child(4) > a > table > tbody > tr > td:nth-child(2)"
@@ -123,14 +129,14 @@ try:
     elem = WebDriverWait(driver, 30).until(
         EC.presence_of_element_located((By.CSS_SELECTOR, draft)))
 except Exception as e:
-    print 'timeout or error loading Gateway page:', e
+    print '⚠️  timeout or error loading Gateway page:', e
     closewindows(driver)
     sys.exit(1)
 
-# close surrounding windows to focus on main
+print '✖  closing surrounding windows"
 closewindows(driver, main_window)
 
-print "clicking on \"Draft\" tab"
+print "👉  clicking on \"Draft\" tab"
 elem.click()
 
 # note tr:nth-child(1) determins the row
@@ -139,22 +145,19 @@ try:
     elem = WebDriverWait(driver, 30).until(
         EC.presence_of_element_located((By.CSS_SELECTOR, message_id)))
 except Exception as e:
-    print 'timeout or error loading Gateway page:', e
+    print '⚠️  timeout or error loading Gateway page:', e
     closewindows(driver)
     sys.exit(1)
 
-print "clicking on first row of \"Drafts\" table"
+print "👉  clicking on first row of \"Drafts\" table"
 elem.click()
-
-
-
 
 # Wait at least until the CommodityCode field loads up
 try:
     _CommodityCode = WebDriverWait(driver, 30).until(
         EC.presence_of_element_located((By.NAME, "_CommodityCode")))
 except Exception as e:
-    print 'timeout or error loading Draft page:', e
+    print '⚠️  timeout or error loading Draft page:', e
     closewindows(driver)
     sys.exit(1)
 
@@ -162,31 +165,31 @@ except Exception as e:
 try:
 	_Add = driver.find_element_by_name('btnDutiableAdd')
 except Exception as e:
-    print 'timeout or error fetching _Add btn:', e
+    print '⚠️  timeout or error fetching _Add btn:', e
 try:
 	_Quantity = driver.find_element_by_name('_Quantity')
 except Exception as e:
-    print 'timeout or error fetching _Quantity:', e
+    print '⚠️  timeout or error fetching _Quantity:', e
 try:
 	_NoOfCase = driver.find_element_by_name('_NoOfCase')
 except Exception as e:
-    print 'timeout or error fetching _NoOfCase:', e
+    print '⚠️  timeout or error fetching _NoOfCase:', e
 try:
 	_SupplierNo = driver.find_element_by_name('_SupplierNo')
 except Exception as e:
-    print 'timeout or error fetching _SupplierNo:', e
+    print '⚠️  timeout or error fetching _SupplierNo:', e
 try:
 	_DutiableItemCostEfp = driver.find_element_by_name('_DutiableItemCostEfp')
 except Exception as e:
-    print 'timeout or error fetching _DutiableItemCostEfp:', e
+    print '⚠️  timeout or error fetching _DutiableItemCostEfp:', e
 try:
 	_InvoiceNo = driver.find_element_by_name('_InvoiceNo')
 except Exception as e:
-    print 'timeout or error fetching _InvoiceNo:', e
+    print '⚠️  timeout or error fetching _InvoiceNo:', e
 try:
 	_DutiableItemCostCurrencySel = Select(driver.find_element_by_name('_DutiableItemCostCurrencySel'))
 except Exception as e:
-    print 'timeout or error fetching _DutiableItemCostCurrencySel:', e
+    print '⚠️  timeout or error fetching _DutiableItemCostCurrencySel:', e
 
 
 def clear_and_fill_input(inpt, value):
@@ -194,17 +197,17 @@ def clear_and_fill_input(inpt, value):
 	try:
 		inpt.send_keys(value)
 	except Exception as e:
-		print 'error inputing', value, e
+		print '⚠️  error inputing', value, e
 
 # Click ADD once to be on last line
 try:
 	_Add.click()
 except Exception as e:
-	print 'error trying to click Add:', e
+	print '⚠️  error trying to click Add:', e
 
-
+print '\n✨✨✨ Time to automagically fill out the form ✨✨✨'
 # Loop through CSV
-for i in range(5):
+for i in range(5): #range(row_len): 
 
 	# Get values
 	# TODO: add more testing for corrupt or missing cells
@@ -229,18 +232,20 @@ for i in range(5):
 	try:
 		_DutiableItemCostCurrencySel.select_by_value('SGD')
 	except Exception as e:
-		print 'error trying to seelct currency:', e
+		print '⚠️ error trying to seelct currency:', e
 	clear_and_fill_input(_InvoiceNo, inv)
 	
 
 
-	print 'about to click ADD with cc: %s, qty: %s, cases: %s, price: %s, invoice: %s, currency: SGD, supplier_num: %s' % (cc, qty, cases, price, inv, supplier_num)
+	print '👉  clicking "ADD with the following filled in form:'
+	print '📌  [cc: %s, qty: %s, cases: %s, price: %s, invoice: %s, currency: SGD]' % (cc, qty, cases, price, inv)
+
 	try:
 		_Add.click()
 	except Exception as e:
-		print 'error trying to click Add:', e
+		print '⚠️  error trying to click Add:', e
 
-
+print '\n 🙌  FINISHED 🙌\n'
 # js_script = '''
 # var A = _PermitApplication_DutiableCommodityInfo__PermitApplication_DutiableCommodityInfo_var;
 # var CCs = [];
