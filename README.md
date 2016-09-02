@@ -1,7 +1,7 @@
 Autofill Customs
 ========
 
-Hong Kong customs decleration website does not allow upload of list of items to declare. The process in which to declare them one by one is painfully manual. This app automates it.
+Hong Kong customs decleration website does not allow bulk upload of list of items to declare. The process in which to declare them one by one is painfully manual. This app automates it.
 
 ###How it works
 
@@ -10,7 +10,7 @@ The Python app will take a csv file as input, map the column names to form input
 ###Install
 
 ```sh
-$ git clone https://github.com/filet-mign0n/autofill_customs && cd autofill_customs && pip install requirements.txt
+$ git clone https://github.com/filet-mign0n/autofill_customs && cd autofill_customs && sudo pip install requirements.txt
 ```
 ###Configure
 
